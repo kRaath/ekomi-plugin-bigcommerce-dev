@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="jumbotron text-center">
+        <div class="container">
+            <a href="/" class="lang-logo">
+                <img src="../resources/images/download.jpg">
+            </a>
+            <h1>Ekomi Integration</h1>
+            <p>A Ekomi Integration app for bigCommerce</p>
+        </div>
+    </div>
+    <div class="container">
+        {% if alert is defined %}
+            <div class="alert alert-{{alert}} text-center" role="alert">
+                {{message}}
+            </div>
+        {% endif %}
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <div>
+                    eKomi Plugin for BigCommerce allows you to integrate your BigCommerce shop easily with eKomi system. This allows you to collect verified reviews, display eKomi seal on your website and get your seller ratings on Google. This helps you increase your website's click through rates, conversion rates and also, if you are running Google AdWord Campaigns, this helps in improving your Quality Score and hence your costs per click.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;eKomi Reviews and Ratings allows you to:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Collect order and/or product base Reviews&lt;/li&gt;&lt;li&gt;Supports Simple, Configurable, Grouped and Bundle products&lt;/li&gt;&lt;li&gt;Manage Reviews: our team of Customer Feedback Managers, reviews each and every review for any terms which are not allowed and also put all negative reviews in moderation.&lt;/li&gt;&lt;li&gt;Publish reviews on search engines: Google, Bing, Yahoo!&lt;/li&gt;&lt;li&gt;Easy Integration with eKomi.&lt;/li&gt;&lt;li&gt;Get Google Seller Ratings.&lt;/li&gt;&lt;li&gt;Increase Click through Rate by over 17%&lt;/li&gt;&lt;li&gt;Increase conversion Rate&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;eKomi is available in English, French, German, Spanish, Dutch, Italian, Russian and Polish&lt;br /&gt;If you have any questions regarding the plugin, please contact your eKomi Account Manager.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Please note&lt;/b&gt; that you will need an eKomi account to use the plugin. To create an eKomi account, go to &lt;a href='http://eKomi.com'&gt;eKomi.com&lt;/a&gt;."
+                </div>
+                <br/>
+                <br/>
+                <div class='info-btns-wrap'>
+                    {%if (config['enabled'] is defined and config['enabled']=='1') %}
+                        <a href='howToInstallWidgets?storeHash={{storeHash}}' class='btn info btn-primary'>How to display widgets?</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-8">
+                <br>
+                <form method="POST" action="saveConfig">
+                    <input type="hidden" name="storeHash" value="{{storeHash}}" />
+                    <table name="prc_configuration" class="ekomi-configuration">
+                        <tbody>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="enabled">Status</label>
+                                </th>
+                                <td>
+                                    <div class="form-group row">
+                                        <select class="form-control" name="enabled" id="enabled" value="0">
+                                            <option value="0" {{(config['enabled'] is defined) ? ((config['enabled']=='0')? 'selected="selected"':''):''}}>Disable</option>
+                                            <option value="1" {{(config['enabled'] is defined) ? ((config['enabled']=='1')? 'selected="selected"':''):''}}>Enable</option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="shopId">Shop ID</label>
+                                </th>
+                                <td>
+                                    <div class="form-group row">
+                                        <input  type="text" name="shopId" id="shopId" class="form-control" value="{{(config['shopId'] is defined)?config['shopId']:''}}" required="required">
+                                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="shopSecret">Shop Secret</label>
+                                </th>
+                                <td>
+                                    <div class="form-group row">
+                                        <input type="text" name="shopSecret" id="prc_shop_pw" class="form-control" value="{{(config['shopSecret'] is defined)?config['shopSecret']:''}}" required="required">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="groupReviews">Group Reviews</label>
+                                </th>
+                                <td>
+                                    <div class="form-group row">
+                                        <select name="groupReviews" id="groupReviews" class="form-control" value="0">
+                                            <option value="0" {{(config['groupReviews'] is defined) ? ((config['groupReviews']=='0')? 'selected="selected"':''):''}}>Disable</option>
+                                            <option value="1" {{(config['groupReviews'] is defined) ? ((config['groupReviews']=='1')? 'selected="selected"':''):''}}>Enable</option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="noReviewsTxt">Text when no reviews found</label>
+                                </th>
+                                <td>
+                                    <div class="form-group row">
+                                        <textarea class="form-control" name="noReviewsTxt" id="noReviewsTxt" rows="3">{{(config['noReviewsTxt'] is defined)?config['noReviewsTxt']:''}}</textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th></th>
+                                <td class="ekomi-submit">
+                                    <div class="form-group row">
+                                        <input type="hidden" id="_wpnonce" name="_wpnonce" value="1a5bc2713e">
+                                        <input type="hidden" name="_wp_http_referer" value="/wordpress/wp-admin/admin.php?page=ekomi-prc-plugin">                    
+                                        <input type="submit" onclick="show_loader(this)" value="Save" class="btn-primary">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th></th>
+                                <td class="centered">
+                                    <div id="loader" style="display: none; position: absolute;left: 33%; width: 100%;">
+                                        <br>
+                                        <br>
+                                        Loading Reviews ...                        <br>
+                                        <img src="../resources/images/loader.gif">
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div> <!-- row -->
+    </div>
+{% endblock %}
