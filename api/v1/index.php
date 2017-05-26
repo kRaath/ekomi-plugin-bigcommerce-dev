@@ -69,11 +69,7 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 //            $reviews = $apisHanlder->getProductReviews($config, $range = "all");
 //            $dbHandler->saveReviews($config, $reviews);
         }
-
         $response = ['storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Configuration saved successfully.'];
-        if ($config['enabled'] == '1') {
-            return $app['twig']->render('installWidgets.twig', $response);
-        }
     } else {
         $response = ['config' => $config, 'storeHash' => $storeHash, 'alert' => 'danger', 'message' => 'Invalid shop id or secret.'];
     }
