@@ -69,7 +69,7 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 //            $reviews = $apisHanlder->getProductReviews($config, $range = "all");
 //            $dbHandler->saveReviews($config, $reviews);
         }
-        $response = ['storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Configuration saved successfully.'];
+        $response = ['config' => $config,'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Configuration saved successfully.'];
     } else {
         $response = ['config' => $config, 'storeHash' => $storeHash, 'alert' => 'danger', 'message' => 'Invalid shop id or secret.'];
     }
