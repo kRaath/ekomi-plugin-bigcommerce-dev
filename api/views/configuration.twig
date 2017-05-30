@@ -85,7 +85,7 @@
                                     <div class="form-group row">
                                         <select name="statuses" id="statuses" class="form-control" value="0">
                                             {% for key, value in statuses %}
-                                                <option value="{{key}}" {{(config['statuses'] is defined) ? ((key in config['statuses']}split(','))? 'selected="selected"':''):''}}>value</option>
+                                                <option value="{{key}}" {{(config['statuses'] is defined) ? ((key in config['statuses']|split(','))? 'selected="selected"':''):''}}>value</option>
                                             {% endfor %}
                                         </select>
                                     </div>
