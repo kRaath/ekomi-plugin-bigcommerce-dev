@@ -103,12 +103,16 @@ $app->get('/load', function (Request $request) use ($app) {
     }
 
     $storeHash = $data['store_hash'];
+    $dbHandler = new DbHandler($app['db']);
+
+    $config = $dbHandler->getStoreConfig($storeHash);
 
     Bigcommerce::useJson();
-    configureBCApi($storeHash);
+    configureBCApi($storeHash, $config['accessToken']);
     Bigcommerce::verifyPeer(false);
     $hooks = Bigcommerce::listWebhooks();
-    var_dump($hooks);die;
+    var_dump($hooks);
+    die;
     // fetch config from DB and send as param
 //	$kedy = getUserKey($data['store_hash'], $data['user']['email']);
     $dbHandler = new DbHandler($app['db']);
@@ -171,7 +175,7 @@ $app->get('/oauth', function (Request $request) use ($app) {
         try {
             // register webhook
             Bigcommerce::useJson();
-            configureBCApi($storeHash);
+            configureBCApi($storeHash, $accessToken);
             Bigcommerce::verifyPeer(false);
             Bigcommerce::createWebhook([
                 "scope" => "store/order/statusUpdated",
@@ -216,25 +220,13 @@ $app->get('/uninstall', function (Request $request) use ($app) {
  * and the store's hash as provided.
  * @param string $storeHash Store hash to point the BigCommece API to for outgoing requests.
  */
-function configureBCApi($storeHash) {
+function configureBCApi($storeHash, $auth_token) {
     $configHelper = new ConfigHelper(new Dotenv\Dotenv(__DIR__ . '/../../'));
     Bigcommerce::configure(array(
         'client_id' => $configHelper->clientId(),
-        'auth_token' => getAuthToken($storeHash),
+        'auth_token' => $auth_token,
         'store_hash' => $storeHash
     ));
-}
-
-/**
- * @param string $storeHash store's hash that we want the access token for
- * @return string the oauth Access (aka Auth) Token to use in API requests.
- */
-function getAuthToken($storeHash) {
-    $dbHandler = new DbHandler($app['db']);
-
-    $config = $dbHandler->getStoreConfig($storeHash);
-
-    return $config['accessToken'];
 }
 
 /**
