@@ -45,4 +45,17 @@ class BCHanlder {
         return $productId;
     }
 
+    public function createWebHooks($appUrl) {
+        try {
+            Bigcommerce::createWebhook([
+                "scope" => "store/order/statusUpdated",
+                "destination" => $appUrl . "orderStatusUpdated",
+                "is_active" => true
+            ]);
+        } catch (Error $error) {
+            echo $error->getCode();
+            echo $error->getMessage();
+        }
+    }
+
 }

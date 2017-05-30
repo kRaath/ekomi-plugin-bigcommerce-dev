@@ -79,24 +79,15 @@
                             </tr>
                             <tr valign="top">
                                 <th scope="row">
-                                    <label for="groupReviews">Group Reviews</label>
+                                    <label for="statuses">Order Status</label>
                                 </th>
                                 <td>
                                     <div class="form-group row">
-                                        <select name="groupReviews" id="groupReviews" class="form-control" value="0">
-                                            <option value="0" {{(config['groupReviews'] is defined) ? ((config['groupReviews']=='0')? 'selected="selected"':''):''}}>Disable</option>
-                                            <option value="1" {{(config['groupReviews'] is defined) ? ((config['groupReviews']=='1')? 'selected="selected"':''):''}}>Enable</option>
+                                        <select name="statuses" id="statuses" class="form-control" value="0">
+                                            {% for key, value in statuses %}
+                                                <option value="{{key}}" {{(config['statuses'] is defined) ? ((key in explode(',',config['statuses']))? 'selected="selected"':''):''}}>value</option>
+                                            {% endfor %}
                                         </select>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr valign="top">
-                                <th scope="row">
-                                    <label for="noReviewsTxt">Text when no reviews found</label>
-                                </th>
-                                <td>
-                                    <div class="form-group row">
-                                        <textarea class="form-control" name="noReviewsTxt" id="noReviewsTxt" rows="3">{{(config['noReviewsTxt'] is defined)?config['noReviewsTxt']:''}}</textarea>
                                     </div>
                                 </td>
                             </tr>

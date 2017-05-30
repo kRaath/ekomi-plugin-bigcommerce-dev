@@ -49,8 +49,8 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
         'enabled' => $request->get('enabled'),
         'shopId' => $id,
         'shopSecret' => $secret,
-        'groupReviews' => $request->get('groupReviews'),
-        'noReviewsTxt' => $request->get('noReviewsTxt'));
+        'statuses' => $request->get('statuses')
+    );
     $apisHanlder = new APIsHanlder();
 
     if ($id && $secret && $apisHanlder->verifyAccount($config)) {
@@ -70,10 +70,19 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 //            $reviews = $apisHanlder->getProductReviews($config, $range = "all");
 //            $dbHandler->saveReviews($config, $reviews);
         }
-        $response = ['config' => $config, 'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Configuration saved successfully.'];
+        $alert = 'info';
+        $message = 'Configuration saved successfully.';
     } else {
-        $response = ['config' => $config, 'storeHash' => $storeHash, 'alert' => 'danger', 'message' => 'Invalid shop id or secret.'];
+        $alert = 'danger';
+        $message = 'Invalid shop id or secret.';
     }
+
+    $bcHanlder = new BCHanlder($dbHandler->getStoreConfig($storeHash), $config);
+
+    $statuses = $bcHanlder->getOrderStatusesList();
+
+    $response = ['config' => $config, 'statuses' => $statuses, 'storeHash' => $storeHash, 'alert' => $alert, 'message' => $message];
+
     return $app['twig']->render('configuration.twig', $response);
 });
 
@@ -113,9 +122,7 @@ $app->get('/load', function (Request $request) use ($app) {
 
     $statuses = $bcHanlder->getOrderStatusesList();
 
-    var_dump($statuses);die;
-    
-    return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'orderStatus' => $statuses, 'storeHash' => $storeHash]);
+    return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'statuses' => $statuses, 'storeHash' => $storeHash]);
 });
 
 $app->get('/oauth', function (Request $request) use ($app) {
@@ -167,26 +174,17 @@ $app->get('/oauth', function (Request $request) use ($app) {
         } else {
             $dbHandler->updateStoreConfig($storeConfig, $storeHash);
         }
-//{"store_id":11111,"producer":"stores/abcde","scope":"store/order/statusUpdated","data":{"type":"order","id":173331},"hash":"3f9ea420af83450d7ef9f78b08c8af25b2213637"}
 
-        try {
-            // register webhook
-            Bigcommerce::useJson();
-            configureBCApi($storeHash, $accessToken);
-            Bigcommerce::verifyPeer(false);
-            Bigcommerce::createWebhook([
-                "scope" => "store/order/statusUpdated",
-                "destination" => $configHelper->APP_URL() . "orderStatusUpdated",
-                "is_active" => true
-            ]);
-        } catch (Error $error) {
-            echo $error->getCode();
-            echo $error->getMessage();
-        }
 
-        $config = $dbHandler->getPrcConfig($storeHash);
+        $prcConfig = $dbHandler->getPrcConfig($storeHash);
 
-        return $app['twig']->render('configuration.twig', ['config' => $config, 'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Please save configuration.']);
+        $bcHanlder = new BCHanlder($dbHandler->getStoreConfig($storeHash), $prcConfig);
+
+        $bcHanlder->createWebHooks($configHelper->APP_URL());
+
+        $statuses = $bcHanlder->getOrderStatusesList();
+
+        return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'statuses' => $statuses, 'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Please save configuration.']);
     } else {
         return 'Something went wrong... [' . $resp->getStatusCode() . '] ' . $resp->getBody();
     }
