@@ -41,6 +41,13 @@ class ConfigHelper {
         $callbackUrl = getenv('BC_CALLBACK_URL');
         return $callbackUrl ?: '';
     }
+    /**
+     * @return string Get the callback URL from the environment vars
+     */
+    public function APP_URL() {
+        $callbackUrl = getenv('APP_URL');
+        return $callbackUrl ?: '';
+    }
 
     /**
      * @return string Get auth service URL from the environment vars

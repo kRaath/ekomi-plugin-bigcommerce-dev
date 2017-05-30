@@ -69,7 +69,7 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 //            $reviews = $apisHanlder->getProductReviews($config, $range = "all");
 //            $dbHandler->saveReviews($config, $reviews);
         }
-        $response = ['config' => $config,'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Configuration saved successfully.'];
+        $response = ['config' => $config, 'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Configuration saved successfully.'];
     } else {
         $response = ['config' => $config, 'storeHash' => $storeHash, 'alert' => 'danger', 'message' => 'Invalid shop id or secret.'];
     }
@@ -77,7 +77,7 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 });
 
 // Our web handlers
-$app->get('/sendOrders', function (Request $request) use ($app) {
+$app->post('/statusUpdated', function (Request $request) use ($app) {
 
     $apisHanlder = new APIsHanlder();
     $dbHandler = new DbHandler($app['db']);
@@ -88,8 +88,7 @@ $app->get('/sendOrders', function (Request $request) use ($app) {
      */
     foreach ($storesConfig as $key => $config) {
         if ($config['enabled'] == '1') {
-//            $reviews = $apisHanlder->getProductReviews($config, $range = "1w");
-//            $dbHandler->saveReviews($config, $reviews);
+            $app['db']->insert('test', ['value' => 'statusUpdated']);
         }
     }
     return "Done";
@@ -104,6 +103,12 @@ $app->get('/load', function (Request $request) use ($app) {
     }
 
     $storeHash = $data['store_hash'];
+
+    Bigcommerce::useJson();
+    configureBCApi($storeHash);
+    Bigcommerce::verifyPeer(false);
+    $hooks = Bigcommerce::listWebhooks();
+    var_dump($hooks);die;
     // fetch config from DB and send as param
 //	$kedy = getUserKey($data['store_hash'], $data['user']['email']);
     $dbHandler = new DbHandler($app['db']);
@@ -160,6 +165,22 @@ $app->get('/oauth', function (Request $request) use ($app) {
             $dbHandler->saveStoreConfig($storeConfig);
         } else {
             $dbHandler->updateStoreConfig($storeConfig, $storeHash);
+        }
+//{"store_id":11111,"producer":"stores/abcde","scope":"store/order/statusUpdated","data":{"type":"order","id":173331},"hash":"3f9ea420af83450d7ef9f78b08c8af25b2213637"}
+
+        try {
+            // register webhook
+            Bigcommerce::useJson();
+            configureBCApi($storeHash);
+            Bigcommerce::verifyPeer(false);
+            Bigcommerce::createWebhook([
+                "scope" => "store/order/statusUpdated",
+                "destination" => $configHelper->APP_URL() . "orderStatusUpdated",
+                "is_active" => true
+            ]);
+        } catch (Error $error) {
+            echo $error->getCode();
+            echo $error->getMessage();
         }
 
         $config = $dbHandler->getPrcConfig($storeHash);
