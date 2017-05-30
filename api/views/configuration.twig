@@ -63,7 +63,7 @@
                                 <td>
                                     <div class="form-group row">
                                         <input  type="text" name="shopId" id="shopId" class="form-control" value="{{(config['shopId'] is defined)?config['shopId']:''}}" required="required">
-                                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                                        <small id="emailHelp" class="form-text text-muted">Shop ID provided by eKomi</small>
                                     </div>
                                 </td>
                             </tr>
@@ -85,9 +85,10 @@
                                     <div class="form-group row">
                                         <select name="statuses" id="statuses" class="form-control" value="0">
                                             {% for key, value in statuses %}
-                                                <option value="{{key}}" {{(config['statuses'] is defined) ? ((key in config['statuses']|split(','))? 'selected="selected"':''):''}}>value</option>
+                                                <option value="{{key}}" {{(config['statuses'] is defined) ? ((key in config['statuses']|split(','))? 'selected="selected"':''):''}}>{{value}}</option>
                                             {% endfor %}
                                         </select>
+                                        <small id="emailHelp" class="form-text text-muted">Order statuses on which order should be exported.</small>
                                     </div>
                                 </td>
                             </tr>
