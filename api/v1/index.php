@@ -49,7 +49,7 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
         'enabled' => $request->get('enabled'),
         'shopId' => $id,
         'shopSecret' => $secret,
-        'statuses' => $request->get('statuses')
+        'statuses' => implode(',', $request->get('statuses'))
     );
     $apisHanlder = new APIsHanlder();
 
