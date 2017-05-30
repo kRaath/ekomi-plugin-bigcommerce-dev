@@ -110,9 +110,7 @@ $app->get('/load', function (Request $request) use ($app) {
     Bigcommerce::useJson();
     configureBCApi($storeHash, $config['accessToken']);
     Bigcommerce::verifyPeer(false);
-    $hooks = Bigcommerce::listWebhooks();
-    var_dump($hooks);
-    die;
+//    $hooks = Bigcommerce::listWebhooks();
     // fetch config from DB and send as param
 //	$kedy = getUserKey($data['store_hash'], $data['user']['email']);
     $dbHandler = new DbHandler($app['db']);
