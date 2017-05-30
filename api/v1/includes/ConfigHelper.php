@@ -17,7 +17,7 @@ class ConfigHelper {
         // Load from .env file
         $dotEnv->load();
     }
-    
+
     /**
      * @return string Get the app's client ID from the environment vars
      */
@@ -41,6 +41,7 @@ class ConfigHelper {
         $callbackUrl = getenv('BC_CALLBACK_URL');
         return $callbackUrl ?: '';
     }
+
     /**
      * @return string Get the callback URL from the environment vars
      */
@@ -56,22 +57,45 @@ class ConfigHelper {
         $bcAuthService = getenv('BC_AUTH_SERVICE');
         return $bcAuthService ?: '';
     }
+
     public function dbHost() {
         $value = getenv('DB_HOST');
         return $value ?: '';
     }
+
     public function dbName() {
         $value = getenv('DB_NAME');
         return $value ?: '';
     }
+
     public function dbUsername() {
         $value = getenv('DB_USERNAME');
         return $value ?: '';
     }
+
     public function dbPassword() {
         $value = getenv('DB_PASSWORD');
         return $value ?: '';
     }
 
+    public function getOrderStatusList() {
+        $status = array(
+            '0' => 'Pending',
+            '1' => 'Awaiting Payment',
+            '2' => 'Awaiting Fulfillment',
+            '3' => 'Awaiting Shipment',
+            '4' => 'Awaiting Pickup',
+            '5' => 'Partially Shipped',
+            '6' => 'Completed',
+            '7' => 'Shipped',
+            '8' => 'Cancelled',
+            '9' => 'Declined',
+            '10' => 'Refunded',
+            '11' => 'Disputed',
+            '12' => 'Manual Verification Required',
+            '13' => 'Partially Refunded'
+        );
+        return $status;
+    }
 
 }
