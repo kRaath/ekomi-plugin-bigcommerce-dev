@@ -111,7 +111,7 @@ $app->get('/load', function (Request $request) use ($app) {
     configureBCApi($storeHash, $config['accessToken']);
     Bigcommerce::verifyPeer(false);
 
-    $hooks = Bigcommerce::getStore();
+    $hooks = Bigcommerce::getOrderStatuses();
     var_dump($hooks);die;
 //    $hooks = Bigcommerce::listWebhooks();
     // fetch config from DB and send as param
