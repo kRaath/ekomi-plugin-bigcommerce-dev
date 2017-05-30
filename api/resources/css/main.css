@@ -60,5 +60,5 @@ xmp{
     top: 10%;
 }
 .orderStatuses{
-    height: 270px;
+    min-height: 270px;
 }
