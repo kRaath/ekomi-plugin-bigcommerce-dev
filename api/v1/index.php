@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Ekomi\DbHandler;
 use Ekomi\APIsHanlder;
 use Ekomi\ConfigHelper;
+use Ekomi\BCHanlder;
 
 $app = new Application();
 $app['debug'] = true;
@@ -105,25 +106,16 @@ $app->get('/load', function (Request $request) use ($app) {
     $storeHash = $data['store_hash'];
     $dbHandler = new DbHandler($app['db']);
 
-    $config = $dbHandler->getStoreConfig($storeHash);
+    $storeConfig = $dbHandler->getStoreConfig($storeHash);
+    $prcConfig = $dbHandler->getPrcConfig($storeHash);
 
-    Bigcommerce::useJson();
-    //configureBCApi($storeHash, $config['accessToken']);
-    Bigcommerce::verifyPeer(false);
+    $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
 
-    $orderStatuses = Bigcommerce::getOrderStatuses();
-    $statuses=array();
-    foreach ($orderStatuses as $key => $status) {
-        $statuses [$status->id]=$status->name;
-    }
+    $statuses = $bcHanlder->getOrderStatusesList();
+
     var_dump($statuses);die;
-//    $hooks = Bigcommerce::listWebhooks();
-    // fetch config from DB and send as param
-//	$kedy = getUserKey($data['store_hash'], $data['user']['email']);
-    $dbHandler = new DbHandler($app['db']);
-    $config = $dbHandler->getPrcConfig($storeHash);
-
-    return $app['twig']->render('configuration.twig', ['config' => $config, 'storeHash' => $storeHash]);
+    
+    return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'orderStatus' => $statuses, 'storeHash' => $storeHash]);
 });
 
 $app->get('/oauth', function (Request $request) use ($app) {
