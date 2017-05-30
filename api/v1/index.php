@@ -108,7 +108,7 @@ $app->get('/load', function (Request $request) use ($app) {
     $config = $dbHandler->getStoreConfig($storeHash);
 
     Bigcommerce::useJson();
-    configureBCApi($storeHash, $config['accessToken']);
+    //configureBCApi($storeHash, $config['accessToken']);
     Bigcommerce::verifyPeer(false);
 
     $orderStatuses = Bigcommerce::getOrderStatuses();
