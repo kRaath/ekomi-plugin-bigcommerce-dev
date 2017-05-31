@@ -100,7 +100,7 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
 
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
     
-    print_r($bcHanlder->get());
+    
     
     $app['db']->insert('test', ['value' => 'orderUpdated']);
 
@@ -213,6 +213,19 @@ $app->get('/uninstall', function (Request $request) use ($app) {
     return "uninstalled successfully";
 });
 
+/**
+ * Configure the static BigCommerce API client with the authorized app's auth token, the client ID from the environment
+ * and the store's hash as provided.
+ * @param string $storeHash Store hash to point the BigCommece API to for outgoing requests.
+ */
+function configureBCApi($storeHash, $auth_token) {
+    $configHelper = new ConfigHelper(new Dotenv\Dotenv(__DIR__ . '/../../'));
+    Bigcommerce::configure(array(
+        'client_id' => $configHelper->clientId(),
+        'auth_token' => $auth_token,
+        'store_hash' => $storeHash
+    ));
+}
 
 /**
  * This is used by the `GET /load` endpoint to load the app in the BigCommerce control panel
