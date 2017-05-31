@@ -48,6 +48,10 @@ class BCHanlder {
     public function createWebHooks($appUrl) {
         $response = NULL;
         try {
+             Bigcommerce::useJson();
+        configureBCApi($this->storeConfig['storeHash'], $this->prcConfig['accessToken']);
+        Bigcommerce::verifyPeer(false);
+        
             $response = Bigcommerce::createWebhook([
                         "scope" => "store/orders/statusUpdated",
                         "destination" => $appUrl . "orderUpdated",
@@ -61,6 +65,9 @@ class BCHanlder {
     }
 
     public function listWebHooks() {
+        Bigcommerce::useJson();
+        configureBCApi($this->storeConfig['storeHash'], $this->prcConfig['accessToken']);
+        Bigcommerce::verifyPeer(false);
         return Bigcommerce::listWebhooks();
     }
 
