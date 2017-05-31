@@ -77,14 +77,19 @@ class BCHanlder {
     public function getOrderData($orderId) {
         $orderData = array();
 
-        $orderData['order'] = Bigcommerce::getOrder($orderId);
+        $order = Bigcommerce::getOrder($orderId);
+        $orderData['order'] =$order;
         $orderData['products'] = Bigcommerce::getOrderProducts($orderId);
+        
+         $customerId = $order['fields']['customer_id'];
+         die($customerId);
+        $orderData['customer'] = Bigcommerce::getCustomer($customerId);
         $orderData['shipingAddresses'] = Bigcommerce::getOrderShippingAddresses($orderId);
         $orderData['shipments'] = Bigcommerce::getShipments($orderId);
 
-        $customerId = 1;
+       
         
-        $orderData['customer'] = Bigcommerce::getCustomer($customerId);
+        
 
 
 
