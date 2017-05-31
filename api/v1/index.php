@@ -131,7 +131,7 @@ $app->get('/load', function (Request $request) use ($app) {
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
 
     $statuses = $bcHanlder->getOrderStatusesList();
-
+    var_dump($bcHanlder->listWebHooks());die;
     return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'statuses' => $statuses, 'storeHash' => $storeHash]);
 });
 
