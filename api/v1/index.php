@@ -104,7 +104,7 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
     
-    $bcHanlder->createWebHooks($configHelper->APP_URL());
+    print_r($bcHanlder->createWebHooks($configHelper->APP_URL()));
 
     print_r($bcHanlder->listWebHooks());
 
