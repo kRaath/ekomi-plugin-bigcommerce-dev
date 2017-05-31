@@ -101,8 +101,9 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
     
     
-    
-    $app['db']->insert('test', ['value' => 'orderUpdated']);
+    print_r($bcHanlder->get());
+    die;
+//    $app['db']->insert('test', ['value' => 'orderUpdated']);
 
     return "Done";
 });
