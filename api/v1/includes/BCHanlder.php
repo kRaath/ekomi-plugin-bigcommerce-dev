@@ -73,5 +73,9 @@ class BCHanlder {
     public function listWebHooks() {
         return Bigcommerce::listWebhooks();
     }
+    
+    public function get() {
+        return Bigcommerce::getOrders($filter=array());
+    }
 
 }
