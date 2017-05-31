@@ -46,15 +46,16 @@ class BCHanlder {
     }
 
     public function createWebHooks($appUrl) {
+        $response = NULL;
         try {
-            Bigcommerce::createWebhook([
-                "scope" => "store/orders/updated",
-                "destination" => $appUrl . "orderUpdated",
-                "is_active" => true
+            $response = Bigcommerce::createWebhook([
+                        "scope" => "store/orders/updated",
+                        "destination" => $appUrl . "orderUpdated",
+                        "is_active" => true
             ]);
         } catch (Error $error) {
-            echo $error->getCode();
-            echo $error->getMessage();
+            $response = $error->getCode();
+            $response .= ' | ' . $error->getMessage();
         }
     }
 
