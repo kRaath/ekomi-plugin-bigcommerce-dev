@@ -73,9 +73,22 @@ class BCHanlder {
     public function listWebHooks() {
         return Bigcommerce::listWebhooks();
     }
-    
-    public function get() {
-        return Bigcommerce::getOrders($filter=array());
+
+    public function getOrderData($orderId) {
+        $orderData = array();
+
+        $orderData['order'] = Bigcommerce::getOrder($orderId);
+        $orderData['products'] = Bigcommerce::getOrderProducts($orderId);
+        $orderData['shipingAddresses'] = Bigcommerce::getOrderShippingAddresses($orderId);
+        $orderData['shipments'] = Bigcommerce::getShipments($orderId);
+
+        $customerId = 1;
+        
+        $orderData['customer'] = Bigcommerce::getCustomer($customerId);
+
+
+
+        return $orderData;
     }
 
 }
