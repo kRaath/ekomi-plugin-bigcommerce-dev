@@ -103,9 +103,9 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
     
-    var_dump($bcHanlder->createWebHooks($configHelper->APP_URL()));
+    print_r($bcHanlder->createWebHooks($configHelper->APP_URL()));
 
-    var_dump($bcHanlder->listWebHooks());
+    print_r($bcHanlder->listWebHooks());
 
     $app['db']->insert('test', ['value' => 'orderUpdated']);
 
@@ -131,7 +131,7 @@ $app->get('/load', function (Request $request) use ($app) {
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
 
     $statuses = $bcHanlder->getOrderStatusesList();
-    var_dump($bcHanlder->listWebHooks());die;
+
     return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'statuses' => $statuses, 'storeHash' => $storeHash]);
 });
 
