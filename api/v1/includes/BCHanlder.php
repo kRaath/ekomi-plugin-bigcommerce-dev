@@ -48,14 +48,18 @@ class BCHanlder {
     public function createWebHooks($appUrl) {
         try {
             Bigcommerce::createWebhook([
-                "scope" => "store/order/statusUpdated",
-                "destination" => $appUrl . "orderStatusUpdated",
+                "scope" => "store/orders/updated",
+                "destination" => $appUrl . "orderUpdated",
                 "is_active" => true
             ]);
         } catch (Error $error) {
             echo $error->getCode();
             echo $error->getMessage();
         }
+    }
+
+    public function listWebHooks() {
+        return Bigcommerce::listWebhooks();
     }
 
 }

@@ -89,20 +89,23 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 });
 
 // Our web handlers
-$app->post('/statusUpdated', function (Request $request) use ($app) {
+$app->post('/orderUpdated', function (Request $request) use ($app) {
 
     $apisHanlder = new APIsHanlder();
     $dbHandler = new DbHandler($app['db']);
-    $storesConfig = $dbHandler->getAllPrcConfig();
 
-    /**
-     * populate the prc_reviews table
-     */
-    foreach ($storesConfig as $key => $config) {
-        if ($config['enabled'] == '1') {
-            $app['db']->insert('test', ['value' => 'statusUpdated']);
-        }
-    }
+    $storeHash = 'ali1vdxuuc';
+    $storeConfig = $dbHandler->getStoreConfig($storeHash);
+    $prcConfig = $dbHandler->getStoreConfig($storeHash);
+
+
+    $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
+    var_dump($bcHanlder->listWebHooks());
+
+    $app['db']->insert('test', ['value' => 'orderUpdated']);
+
+    die;
+
     return "Done";
 });
 $app->get('/load', function (Request $request) use ($app) {
