@@ -49,7 +49,7 @@ class BCHanlder {
         $response = NULL;
         try {
             $response = Bigcommerce::createWebhook([
-                        "scope" => "store/orders/updated",
+                        "scope" => "store/orders/statusUpdated",
                         "destination" => $appUrl . "orderUpdated",
                         "is_active" => true
             ]);
