@@ -57,6 +57,7 @@ class BCHanlder {
             $response = $error->getCode();
             $response .= ' | ' . $error->getMessage();
         }
+        return $response;
     }
 
     public function listWebHooks() {
