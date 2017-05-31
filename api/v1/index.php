@@ -99,7 +99,13 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     $prcConfig = $dbHandler->getStoreConfig($storeHash);
     var_dump($storeConfig);
 
+    $configHelper = new ConfigHelper(new Dotenv\Dotenv(__DIR__ . '/../../'));
+
+    
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
+    
+    $bcHanlder->createWebHooks($configHelper->APP_URL());
+
     print_r($bcHanlder->listWebHooks());
 
     $app['db']->insert('test', ['value' => 'orderUpdated']);
