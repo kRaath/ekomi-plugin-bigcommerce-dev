@@ -49,6 +49,8 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
         'enabled' => $request->get('enabled'),
         'shopId' => $id,
         'shopSecret' => $secret,
+        'productReviews' => $request->get('productReviews'),
+        'mode' => $request->get('mode'),
         'statuses' => implode(',', $request->get('statuses'))
     );
     $apisHanlder = new APIsHanlder();

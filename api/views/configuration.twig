@@ -24,7 +24,7 @@
                     <p><strong>eKomi Reviews and Ratings allows you to:</strong></p>
                     <ul><li>Collect order and/or product base Reviews</li>
                         <li>Supports Simple, Configurable, Grouped and Bundle products</li>
-                        <li>Manage Reviews: our team of Customer Feedback Managers, reviews each and every review for any terms which are not allowed and also put all negative reviews in moderation.</li>
+                        <li>Manage Reviews: our team of Customer Feedback Managers, reviews each and every review for any terms which are not allowed and also put all negative reviews in modeeration.</li>
                         <li>Publish reviews on search engines: Google, Bing, Yahoo!</li>
                         <li>Easy Integration with eKomi.</li>
                         <li>Get Google Seller Ratings.</li>
@@ -74,6 +74,33 @@
                                 <td>
                                     <div class="form-group row">
                                         <input type="text" name="shopSecret" id="prc_shop_pw" class="form-control" value="{{(config['shopSecret'] is defined)?config['shopSecret']:''}}" required="required">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="productReviews">Product Reviews</label>
+                                </th>
+                                <td>
+                                    <div class="form-group row">
+                                        <select class="form-control" name="productReviews" id="productReviews" value="0">
+                                            <option value="0" {{(config['productReviews'] is defined) ? ((config['productReviews']=='0')? 'selected="selected"':''):''}}>Disable</option>
+                                            <option value="1" {{(config['productReviews'] is defined) ? ((config['productReviews']=='1')? 'selected="selected"':''):''}}>Enable</option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="mode">Mode</label>
+                                </th>
+                                <td>
+                                    <div class="form-group row">
+                                        <select class="form-control" name="mode" id="mode" value="0">
+                                            <option value="sms" {{(config['mode'] is defined) ? ((config['mode']=='sms')? 'selected="selected"':''):''}}>SMS</option>
+                                            <option value="email" {{(config['mode'] is defined) ? ((config['mode']=='email')? 'selected="selected"':''):''}}>Email</option>
+                                            <option value="fallback" {{(config['mode'] is defined) ? ((config['mode']=='fallback')? 'selected="selected"':''):''}}>SMS if contact number, otherwise Email</option>
+                                        </select>
                                     </div>
                                 </td>
                             </tr>
