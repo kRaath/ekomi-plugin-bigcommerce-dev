@@ -97,16 +97,15 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     $storeHash = 'ali1vdxuuc';
     $storeConfig = $dbHandler->getStoreConfig($storeHash);
     $prcConfig = $dbHandler->getStoreConfig($storeHash);
-    var_dump($storeConfig);
 
     $configHelper = new ConfigHelper(new Dotenv\Dotenv(__DIR__ . '/../../'));
 
     
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
     
-    print_r($bcHanlder->createWebHooks($configHelper->APP_URL()));
+    var_dump($bcHanlder->createWebHooks($configHelper->APP_URL()));
 
-    print_r($bcHanlder->listWebHooks());
+    var_dump($bcHanlder->listWebHooks());
 
     $app['db']->insert('test', ['value' => 'orderUpdated']);
 
