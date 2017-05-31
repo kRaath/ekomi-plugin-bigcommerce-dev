@@ -97,10 +97,10 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     $storeHash = 'ali1vdxuuc';
     $storeConfig = $dbHandler->getStoreConfig($storeHash);
     $prcConfig = $dbHandler->getStoreConfig($storeHash);
-
+    var_dump($storeConfig);
 
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
-    var_dump($bcHanlder->listWebHooks());
+    print_r($bcHanlder->listWebHooks());
 
     $app['db']->insert('test', ['value' => 'orderUpdated']);
 
