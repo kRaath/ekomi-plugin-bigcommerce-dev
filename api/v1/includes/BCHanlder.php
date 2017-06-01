@@ -83,8 +83,8 @@ class BCHanlder {
         
          $customerId = $order;
          print_r($order);
-         print_r($customerId->fields);
-         print_r($customerId['fields']); die;
+         print_r($customerId->customer_id);
+         print_r($customerId['customer_id']); die;
         $orderData['customer'] = Bigcommerce::getCustomer($customerId);
         $orderData['shipingAddresses'] = Bigcommerce::getOrderShippingAddresses($orderId);
         $orderData['shipments'] = Bigcommerce::getShipments($orderId);
