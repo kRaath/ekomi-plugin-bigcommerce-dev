@@ -99,9 +99,11 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     $prcConfig = $dbHandler->getStoreConfig($storeHash);
 
     $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
-    
-    
-    print_r($bcHanlder->getOrderData(102));
+
+
+    $orderData = $bcHanlder->getOrderData(102);
+    $temp = json_encode($orderData);
+    print_r(json_decode($temp));
     die;
 //    $app['db']->insert('test', ['value' => 'orderUpdated']);
 

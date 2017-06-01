@@ -31,40 +31,4 @@ class APIsHanlder {
             return TRUE;
         }
     }
-
-    public function getProduct($productId, $clinetId, $storeConfig) {
-        $headers = [
-            "X-Auth-Client: {$clinetId}",
-            "X-Auth-Token: {$storeConfig['accessToken']}",
-            'Accept:application/json',
-            'Content-Type:application/json'
-        ];
-
-        $uri = "https://api.bigcommerce.com/stores/{$storeConfig['storeHash']}/v3/catalog/products/{$productId}?include=variants";
-        $ch = curl_init($uri);
-        curl_setopt_array($ch, array(
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_VERBOSE => 1
-        ));
-        $output = curl_exec($ch);
-        curl_close($ch);
-
-        $product = json_decode($output);
-        if ($product) {
-            return $product->data;
-        }
-        return NULL;
-    }
-
-    public function getVariantIDs($bcProduct) {
-        $productId = '';
-        if ($bcProduct) {
-            foreach ($bcProduct->variants as $key => $variant) {
-                $productId .= ',' . "'$variant->id'";
-            }
-        }
-        return $productId;
-    }
-
 }
