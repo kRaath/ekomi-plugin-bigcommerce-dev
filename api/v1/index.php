@@ -114,9 +114,6 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
                 error_log(" orderId:$orderId => " . json_encode($response), 3, $erroLogPath . '/error.log');
             }
             $return = " orderId:$orderId => " . json_encode($response);
-        } else {
-            $return = "OrderID {$orderId} not found.";
-            error_log($return, 3, $erroLogPath . '/error.log');
         }
     } else {
         $return = "eKomi Integration is not active.";
