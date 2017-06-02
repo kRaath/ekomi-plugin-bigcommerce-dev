@@ -109,8 +109,6 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
 
             $response = $apisHanlder->sendDataToPD($fields);
 
-            print_r(json_decode($fields));
-
             if ($response['code'] != 201) {
                 $erroLogPath = explode('/api/', $_SERVER['SCRIPT_FILENAME'])[0];
                 error_log(" orderId:$orderId => " . json_encode($response), 3, $erroLogPath . '/error.log');
