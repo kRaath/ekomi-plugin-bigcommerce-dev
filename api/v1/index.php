@@ -60,7 +60,7 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
         } else {
             $dbHandler->updatePrcConfig($config, $storeHash);
         }
-        
+
         $alert = 'info';
         $message = 'Configuration saved successfully.';
     } else {
@@ -88,6 +88,8 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     $storeConfig = $dbHandler->getStoreConfig($storeHash);
     $prcConfig = $dbHandler->getPrcConfig($storeHash);
 
+    $return = NULL;
+
     if ($prcConfig['enabled'] == '1') {
         $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
 
@@ -106,18 +108,21 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
             $fields = json_encode($fields);
 
             $response = $apisHanlder->sendDataToPD($fields);
-            
+
             print_r(json_decode($fields));
-            
+
             if ($response['code'] != 201) {
                 $erroLogPath = explode('/api/', $_SERVER['SCRIPT_FILENAME'])[0];
                 error_log(" orderId:$orderId => " . json_encode($response), 3, $erroLogPath . '/error.log');
             }
+            $return = " orderId:$orderId => " . json_encode($response);
+        } else {
+            $return = "OrderID {$orderId} not found.";
         }
-
-        return "Order sent successfully.";
+    } else {
+        $return = "eKomi Integration is not active.";
     }
-    return "eKomi Integration is not active.";
+    return $return;
 });
 $app->get('/load', function (Request $request) use ($app) {
 
