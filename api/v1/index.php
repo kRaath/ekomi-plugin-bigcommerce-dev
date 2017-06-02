@@ -80,7 +80,7 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 $app->post('/orderUpdated', function (Request $request) use ($app) {
 
     $storeHash = 'ali1vdxuuc';
-    $orderId = 101;
+    $orderId = 102;
 
     $apisHanlder = new APIsHanlder();
     $dbHandler = new DbHandler($app['db']);
@@ -89,6 +89,7 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
     $prcConfig = $dbHandler->getPrcConfig($storeHash);
 
     $return = NULL;
+    $erroLogPath = explode('/api/', $_SERVER['SCRIPT_FILENAME'])[0];
 
     if ($prcConfig['enabled'] == '1') {
         $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
@@ -110,12 +111,12 @@ $app->post('/orderUpdated', function (Request $request) use ($app) {
             $response = $apisHanlder->sendDataToPD($fields);
 
             if ($response['code'] != 201) {
-                $erroLogPath = explode('/api/', $_SERVER['SCRIPT_FILENAME'])[0];
                 error_log(" orderId:$orderId => " . json_encode($response), 3, $erroLogPath . '/error.log');
             }
             $return = " orderId:$orderId => " . json_encode($response);
         } else {
             $return = "OrderID {$orderId} not found.";
+            error_log($return, 3, $erroLogPath . '/error.log');
         }
     } else {
         $return = "eKomi Integration is not active.";
