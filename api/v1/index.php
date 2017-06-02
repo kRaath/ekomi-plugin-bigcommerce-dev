@@ -4,11 +4,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Silex\Application;
 use Bigcommerce\Api\Client as Bigcommerce;
-use Firebase\JWT\JWT;
 use Guzzle\Http\Client;
-use Handlebars\Handlebars;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Ekomi\DbHandler;
 use Ekomi\APIsHanlder;
 use Ekomi\ConfigHelper;
@@ -54,24 +51,16 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
         'statuses' => implode(',', $request->get('statuses'))
     );
     $apisHanlder = new APIsHanlder();
+    $dbHandler = new DbHandler($app['db']);
 
     if ($id && $secret && $apisHanlder->verifyAccount($config)) {
-
-        $dbHandler = new DbHandler($app['db']);
 
         if (!$dbHandler->getPrcConfig($storeHash)) {
             $dbHandler->savePrcConfig($config);
         } else {
             $dbHandler->updatePrcConfig($config, $storeHash);
         }
-
-        /**
-         * populate the prc_reviews table
-         */
-        if ($config['enabled'] == '1') {
-//            $reviews = $apisHanlder->getProductReviews($config, $range = "all");
-//            $dbHandler->saveReviews($config, $reviews);
-        }
+        
         $alert = 'info';
         $message = 'Configuration saved successfully.';
     } else {
@@ -88,26 +77,47 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
     return $app['twig']->render('configuration.twig', $response);
 });
 
-// Our web handlers
 $app->post('/orderUpdated', function (Request $request) use ($app) {
+
+    $storeHash = 'ali1vdxuuc';
+    $orderId = 101;
 
     $apisHanlder = new APIsHanlder();
     $dbHandler = new DbHandler($app['db']);
 
-    $storeHash = 'ali1vdxuuc';
     $storeConfig = $dbHandler->getStoreConfig($storeHash);
-    $prcConfig = $dbHandler->getStoreConfig($storeHash);
+    $prcConfig = $dbHandler->getPrcConfig($storeHash);
 
-    $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
+    if ($prcConfig['enabled'] == '1') {
+        $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
 
+        $orderData = $bcHanlder->getOrderData($orderId);
 
-    $orderData = $bcHanlder->getOrderData(102);
-    $temp = json_encode($orderData);
-    print_r(json_decode($temp));
-    die;
-//    $app['db']->insert('test', ['value' => 'orderUpdated']);
+        if (!empty($orderData)) {
+            $fields = array(
+                'shop_id' => $prcConfig['shopId'],
+                'interface_password' => $prcConfig['shopSecret'],
+                'order_data' => $orderData,
+                'mode' => $prcConfig['mode'],
+                'product_reviews' => $prcConfig['productReviews'],
+                'plugin_name' => 'bigcommerce'
+            );
 
-    return "Done";
+            $fields = json_encode($fields);
+
+            $response = $apisHanlder->sendDataToPD($fields);
+            
+            print_r(json_decode($fields));
+            
+            if ($response['code'] != 201) {
+                $erroLogPath = explode('/api/', $_SERVER['SCRIPT_FILENAME'])[0];
+                error_log(" orderId:$orderId => " . json_encode($response), 3, $erroLogPath . '/error.log');
+            }
+        }
+
+        return "Order sent successfully.";
+    }
+    return "eKomi Integration is not active.";
 });
 $app->get('/load', function (Request $request) use ($app) {
 

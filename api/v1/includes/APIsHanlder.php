@@ -31,4 +31,26 @@ class APIsHanlder {
             return TRUE;
         }
     }
+
+    /**
+     * 
+     * @param String $ordersData
+     * @return type
+     */
+    public function sendDataToPD($fields) {
+        $url = 'https://plugins-dashboard-staging-1.ekomiapps.de/api/v1/order';
+        $boundary = md5(time());
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('ContentType:multipart/form-data;boundary=' . $boundary));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return json_decode($response, true);
+    }
+
 }
