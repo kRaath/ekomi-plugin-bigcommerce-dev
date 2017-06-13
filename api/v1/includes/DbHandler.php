@@ -41,33 +41,33 @@ class DbHandler {
     }
 
     /**
-     * prc_config CRUD
+     * plugin_config CRUD
      */
-    public function getPrcConfig($storeHash) {
-        $data = $this->conn->fetchAssoc('SELECT * FROM prc_config WHERE storeHash = ?', array($storeHash));
+    public function getPluginConfig($storeHash) {
+        $data = $this->conn->fetchAssoc('SELECT * FROM plugin_config WHERE storeHash = ?', array($storeHash));
 
         return $data;
     }
 
-    public function getAllPrcConfig() {
-        $data = $this->conn->fetchAll('SELECT * FROM prc_config');
+    public function getAllPluginConfig() {
+        $data = $this->conn->fetchAll('SELECT * FROM plugin_config');
 
         return $data;
     }
 
-    public function savePrcConfig($config) {
-        $data = $this->conn->insert('prc_config', $config);
+    public function savePluginConfig($config) {
+        $data = $this->conn->insert('plugin_config', $config);
 
         return $data;
     }
 
-    public function updatePrcConfig($config, $storeHash) {
-        $value = $this->conn->update('prc_config', $config, array('storeHash' => $storeHash));
+    public function updatePluginConfig($config, $storeHash) {
+        $value = $this->conn->update('plugin_config', $config, array('storeHash' => $storeHash));
         return $value;
     }
 
-    public function removePrcConfig($storeHash) {
-        $val = $this->conn->delete('prc_config', array('storeHash' => $storeHash));
+    public function removePluginConfig($storeHash) {
+        $val = $this->conn->delete('plugin_config', array('storeHash' => $storeHash));
 
         return $val;
     }

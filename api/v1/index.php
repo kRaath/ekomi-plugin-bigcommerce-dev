@@ -6,6 +6,7 @@ use Silex\Application;
 use Bigcommerce\Api\Client as Bigcommerce;
 use Guzzle\Http\Client;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Ekomi\DbHandler;
 use Ekomi\APIsHanlder;
 use Ekomi\ConfigHelper;
@@ -55,10 +56,10 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 
     if ($id && $secret && $apisHanlder->verifyAccount($config)) {
 
-        if (!$dbHandler->getPrcConfig($storeHash)) {
-            $dbHandler->savePrcConfig($config);
+        if (!$dbHandler->getPluginConfig($storeHash)) {
+            $dbHandler->savePluginConfig($config);
         } else {
-            $dbHandler->updatePrcConfig($config, $storeHash);
+            $dbHandler->updatePluginConfig($config, $storeHash);
         }
 
         $alert = 'info';
@@ -66,6 +67,9 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
     } else {
         $alert = 'danger';
         $message = 'Invalid shop id or secret.';
+        $config['enabled'] = 0;
+        $config['shopId'] = '';
+        $config['shopSecret'] = '';
     }
 
     $bcHanlder = new BCHanlder($dbHandler->getStoreConfig($storeHash), $config);
@@ -79,46 +83,60 @@ $app->post('/saveConfig', function (Request $request) use ($app) {
 
 $app->post('/orderUpdated', function (Request $request) use ($app) {
 
-    $storeHash = 'ali1vdxuuc';
-    $orderId = 102;
-
-    $apisHanlder = new APIsHanlder();
-    $dbHandler = new DbHandler($app['db']);
-
-    $storeConfig = $dbHandler->getStoreConfig($storeHash);
-    $prcConfig = $dbHandler->getPrcConfig($storeHash);
-
-    $return = NULL;
     $erroLogPath = explode('/api/', $_SERVER['SCRIPT_FILENAME'])[0];
 
-    if ($prcConfig['enabled'] == '1') {
-        $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
+    $inputJSON = file_get_contents('php://input');
+    $input = json_decode($inputJSON, TRUE);
+    
+    if (isset($input['data']['type']) && $input['data']['type'] == 'order') {
 
-        $orderData = $bcHanlder->getOrderData($orderId);
+        $data = $input['data'];
 
-        if (!empty($orderData)) {
-            $fields = array(
-                'shop_id' => $prcConfig['shopId'],
-                'interface_password' => $prcConfig['shopSecret'],
-                'order_data' => $orderData,
-                'mode' => $prcConfig['mode'],
-                'product_reviews' => $prcConfig['productReviews'],
-                'plugin_name' => 'bigcommerce'
-            );
+        list($context, $storeHash) = explode('/', $input['producer'], 2);
 
-            $fields = json_encode($fields);
+        $orderId = $data['id'];
 
-            $response = $apisHanlder->sendDataToPD($fields);
+        $apisHanlder = new APIsHanlder();
+        $dbHandler = new DbHandler($app['db']);
 
-            if ($response['code'] != 201) {
-                error_log(" orderId:$orderId => " . json_encode($response), 3, $erroLogPath . '/error.log');
+        $storeConfig = $dbHandler->getStoreConfig($storeHash);
+        $pluginConfig = $dbHandler->getPluginConfig($storeHash);
+
+        $return = 'something went wrong.';
+        $statusCode = 200;
+
+        if ($pluginConfig['enabled'] == '1') {
+            $bcHanlder = new BCHanlder($storeConfig, $pluginConfig);
+
+            $orderData = $bcHanlder->getOrderData($orderId);
+
+            if (!empty($orderData)) {
+                $fields = array(
+                    'shop_id' => $pluginConfig['shopId'],
+                    'interface_password' => $pluginConfig['shopSecret'],
+                    'order_data' => $orderData,
+                    'mode' => $pluginConfig['mode'],
+                    'product_reviews' => $pluginConfig['productReviews'],
+                    'plugin_name' => 'bigcommerce'
+                );
+
+                $fields = json_encode($fields);
+
+                $response = $apisHanlder->sendDataToPD($fields);
+
+                if ($response['code'] != 201) {
+                    error_log(" Store:{$storeHash},orderId:$orderId => " . json_encode($response), 3, $erroLogPath . '/error.log');
+                }
+                $return = " Store:{$storeHash},orderId:$orderId => " . json_encode($response);
             }
-            $return = " orderId:$orderId => " . json_encode($response);
+        } else {
+            $return = "eKomi Integration is not active.";
         }
-    } else {
-        $return = "eKomi Integration is not active.";
     }
-    return $return;
+    
+//    error_log($return, 3, $erroLogPath . '/error.log');
+    
+    return new Response($return, $statusCode);
 });
 $app->get('/load', function (Request $request) use ($app) {
 
@@ -133,13 +151,13 @@ $app->get('/load', function (Request $request) use ($app) {
     $dbHandler = new DbHandler($app['db']);
 
     $storeConfig = $dbHandler->getStoreConfig($storeHash);
-    $prcConfig = $dbHandler->getPrcConfig($storeHash);
+    $pluginConfig = $dbHandler->getPluginConfig($storeHash);
 
-    $bcHanlder = new BCHanlder($storeConfig, $prcConfig);
+    $bcHanlder = new BCHanlder($storeConfig, $pluginConfig);
 
     $statuses = $bcHanlder->getOrderStatusesList();
 
-    return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'statuses' => $statuses, 'storeHash' => $storeHash]);
+    return $app['twig']->render('configuration.twig', ['config' => $pluginConfig, 'statuses' => $statuses, 'storeHash' => $storeHash]);
 });
 
 $app->get('/oauth', function (Request $request) use ($app) {
@@ -182,7 +200,7 @@ $app->get('/oauth', function (Request $request) use ($app) {
 
         //removes the existing config and reviews in table
         $dbHandler->removeStoreConfig($storeHash);
-        $dbHandler->removePrcConfig($storeHash);
+        $dbHandler->removePluginConfig($storeHash);
 
         $store = $dbHandler->getStoreConfig($storeHash);
 
@@ -193,15 +211,15 @@ $app->get('/oauth', function (Request $request) use ($app) {
         }
 
 
-        $prcConfig = $dbHandler->getPrcConfig($storeHash);
+        $pluginConfig = $dbHandler->getPluginConfig($storeHash);
 
-        $bcHanlder = new BCHanlder($dbHandler->getStoreConfig($storeHash), $prcConfig);
+        $bcHanlder = new BCHanlder($dbHandler->getStoreConfig($storeHash), $pluginConfig);
 
         $bcHanlder->createWebHooks($configHelper->APP_URL());
 
         $statuses = $bcHanlder->getOrderStatusesList();
 
-        return $app['twig']->render('configuration.twig', ['config' => $prcConfig, 'statuses' => $statuses, 'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Please save configuration.']);
+        return $app['twig']->render('configuration.twig', ['config' => $pluginConfig, 'statuses' => $statuses, 'storeHash' => $storeHash, 'alert' => 'info', 'message' => 'Please save configuration.']);
     } else {
         return 'Something went wrong... [' . $resp->getStatusCode() . '] ' . $resp->getBody();
     }
@@ -221,8 +239,7 @@ $app->get('/uninstall', function (Request $request) use ($app) {
 
     $dbHandler = new DbHandler($app['db']);
     $dbHandler->removeStoreConfig($storeHash);
-    $dbHandler->removePrcConfig($storeHash);
-//    $dbHandler->removePrcReviews($storeHash);
+    $dbHandler->removePluginConfig($storeHash);
 
     return "uninstalled successfully";
 });
